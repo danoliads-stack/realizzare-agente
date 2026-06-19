@@ -773,7 +773,7 @@ function renderAoVivo() {
     <div class="ao-vivo-list">${lista.map(l => {
       const { txt, cls } = tempo(l.created_at);
       const isNova = novas.has(l.id);
-      return `<div class="conv${isNova?' nova':''}" onclick="abrirLead('${l.id}');novas.delete('${l.id}');renderAoVivo()">
+      return `<div class="conv${isNova?' nova':''}" onclick="abrirLead('${l.id}','chat');novas.delete('${l.id}');renderAoVivo()">
         <div class="conv-av">${l.nome[0]}</div>
         <div class="conv-body">
           <div class="conv-r1">
@@ -795,11 +795,11 @@ function renderAoVivo() {
 }
 
 // ─── Painel lead ──────────────────────────────────────────────────────────────
-function abrirLead(id) {
+function abrirLead(id, aba='info') {
   leadAtual = todos.find(l => l.id === id); if (!leadAtual) return;
   novas.delete(id);
   document.getElementById('lo').classList.add('open');
-  trocarTab('info');
+  trocarTab(aba);
 }
 function fecharLead() { document.getElementById('lo').classList.remove('open'); leadAtual = null; }
 
