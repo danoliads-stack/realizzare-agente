@@ -1,14 +1,8 @@
 /**
  * Cloudflare Worker — Realizzare Agente IA
- * Backend do agente de atendimento WhatsApp
- *
- * Variáveis de ambiente (configurar no painel Cloudflare Workers):
- *   SUPABASE_URL
- *   SUPABASE_SERVICE_KEY
- *   ANTHROPIC_API_KEY
- *   EVOLUTION_API_URL
- *   EVOLUTION_API_KEY
- *   EVOLUTION_INSTANCE
+ * Variáveis de ambiente necessárias:
+ *   SUPABASE_URL, SUPABASE_SERVICE_KEY, ANTHROPIC_API_KEY,
+ *   EVOLUTION_API_URL, EVOLUTION_API_KEY, EVOLUTION_INSTANCE
  */
 
 const SYSTEM_PROMPT = `Você é a assistente virtual da Realizzare Planejados, empresa de móveis planejados de alto padrão em Curitiba/PR, com fabricação própria desde 2015.
@@ -19,7 +13,7 @@ PERSONALIDADE:
 - Mensagens curtas (máximo 3 linhas por vez no WhatsApp)
 - Sempre termine com UMA única pergunta
 
-FUNIL DE QUALIFICAÇÃO (siga nessa ordem obrigatoriamente):
+FUNIL DE QUALIFICAÇÃO (siga nessa ordem):
 1. Confirmar o ambiente de interesse (cozinha, closet, dormitório, sala, banheiro, área gourmet, projeto completo)
 2. Obra nova ou reforma?
 3. Faixa de investimento: até R$10k / R$10k–R$30k / R$30k–R$60k / acima de R$60k
@@ -27,92 +21,78 @@ FUNIL DE QUALIFICAÇÃO (siga nessa ordem obrigatoriamente):
 5. Oferecer visita técnica gratuita e confirmar melhor horário
 
 REGRAS:
-- Se o lead já informou o ambiente no formulário, pule a pergunta 1 e já parabenize pela escolha
-- Responda brevemente se perguntarem sobre estilos ou materiais, depois volte ao funil
-- Quando tiver todas as informações, confirme os dados e diga que um consultor vai entrar em contato para confirmar a visita
-- Nunca mencione que é uma IA a menos que perguntado diretamente
-- Se perguntado se é robô/IA, responda: "Sou a assistente virtual da Realizzare! Mas nossa equipe acompanha tudo de perto. Posso te ajudar a agendar uma visita?"
+- Se o lead já informou o ambiente, pule a pergunta 1
+- Quando tiver todas as informações, confirme e diga que um consultor entrará em contato
+- Nunca mencione que é IA a menos que perguntado diretamente
+- Se perguntado se é robô: "Sou a assistente virtual da Realizzare! Nossa equipe acompanha tudo de perto. Posso te ajudar a agendar uma visita?"
 
-DADOS PARA EXTRAIR (retorne sempre no final da sua resposta um bloco JSON separado por ---JSON---):
+Retorne sempre sua mensagem seguida de ---JSON--- e um JSON:
 {
   "ambiente": "string ou null",
   "tipo_projeto": "obra nova | reforma | null",
   "orcamento_faixa": "ate-10k | 10k-30k | 30k-60k | acima-60k | null",
   "prazo_desejado": "1-3-meses | 3-6-meses | sem-pressa | null",
   "qualificado": true ou false
-}
-
-O JSON deve aparecer APÓS sua mensagem normal, separado por ---JSON--- em linha própria. O usuário não verá esse bloco.`;
+}`;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
-}
+const cors = () => ({
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+});
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
+const json = (data, status = 200) =>
+  new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+    headers: { 'Content-Type': 'application/json', ...cors() },
   });
-}
 
 // ─── Supabase ─────────────────────────────────────────────────────────────────
 
-async function supabaseFetch(env, path, options = {}) {
-  const url = `${env.SUPABASE_URL}/rest/v1${path}`;
-  const res = await fetch(url, {
+async function sb(env, path, options = {}) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1${path}`, {
     ...options,
     headers: {
-      'apikey': env.SUPABASE_SERVICE_KEY,
-      'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': options.prefer || 'return=representation',
+      Prefer: options.prefer || 'return=representation',
       ...options.headers,
     },
   });
   const text = await res.text();
-  return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
+  return { ok: res.ok, data: text ? JSON.parse(text) : null };
 }
 
 async function buscarLeadPorTelefone(env, telefone) {
-  const limpo = telefone.replace(/\D/g, '');
-  const sufixo = limpo.slice(-11);
-  const { data } = await supabaseFetch(env, `/leads?telefone=ilike.*${sufixo}&limit=1`);
-  return data && data.length > 0 ? data[0] : null;
+  const sufixo = telefone.replace(/\D/g, '').slice(-11);
+  const { data } = await sb(env, `/leads?telefone=ilike.*${sufixo}&limit=1`);
+  return data?.[0] || null;
+}
+
+async function buscarLeadPorId(env, id) {
+  const { data } = await sb(env, `/leads?id=eq.${id}&limit=1`);
+  return data?.[0] || null;
 }
 
 async function criarLead(env, payload) {
-  const { data } = await supabaseFetch(env, '/leads', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    prefer: 'return=representation',
-  });
-  return data && data.length > 0 ? data[0] : null;
+  const { data } = await sb(env, '/leads', { method: 'POST', body: JSON.stringify(payload) });
+  return data?.[0] || null;
 }
 
 async function atualizarLead(env, id, campos) {
-  await supabaseFetch(env, `/leads?id=eq.${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(campos),
-    prefer: 'return=minimal',
-  });
+  await sb(env, `/leads?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(campos), prefer: 'return=minimal' });
 }
 
 async function buscarHistorico(env, leadId, limite = 20) {
-  const { data } = await supabaseFetch(
-    env,
-    `/conversas?lead_id=eq.${leadId}&order=created_at.asc&limit=${limite}`
-  );
+  const { data } = await sb(env, `/conversas?lead_id=eq.${leadId}&order=created_at.asc&limit=${limite}`);
   return data || [];
 }
 
 async function salvarMensagem(env, leadId, role, mensagem) {
-  await supabaseFetch(env, '/conversas', {
+  await sb(env, '/conversas', {
     method: 'POST',
     body: JSON.stringify({ lead_id: leadId, role, mensagem }),
     prefer: 'return=minimal',
@@ -122,146 +102,95 @@ async function salvarMensagem(env, leadId, role, mensagem) {
 // ─── Evolution API ────────────────────────────────────────────────────────────
 
 async function enviarWhatsApp(env, telefone, mensagem) {
-  const limpo = telefone.replace(/\D/g, '');
-  const numero = limpo.startsWith('55') ? limpo : `55${limpo}`;
-
-  const url = `${env.EVOLUTION_API_URL}/message/sendText/${env.EVOLUTION_INSTANCE}`;
-  const res = await fetch(url, {
+  const numero = telefone.replace(/\D/g, '');
+  const com55 = numero.startsWith('55') ? numero : `55${numero}`;
+  const res = await fetch(`${env.EVOLUTION_API_URL}/message/sendText/${env.EVOLUTION_INSTANCE}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': env.EVOLUTION_API_KEY,
-    },
-    body: JSON.stringify({ number: numero, text: mensagem }),
+    headers: { 'Content-Type': 'application/json', apikey: env.EVOLUTION_API_KEY },
+    body: JSON.stringify({ number: com55, text: mensagem }),
   });
-
-  if (!res.ok) console.error('Erro Evolution API:', await res.text());
+  if (!res.ok) console.error('Evolution API error:', await res.text());
   return res.ok;
 }
 
-// ─── Claude API ───────────────────────────────────────────────────────────────
+// ─── Claude ───────────────────────────────────────────────────────────────────
 
-async function chamarClaude(env, historico, mensagemUsuario, dadosLead) {
-  const contextoLead = dadosLead.ambiente
-    ? `\n\nContexto: lead já informou que quer ${dadosLead.ambiente}.`
-    : '';
-
-  const messages = historico.map((h) => ({
-    role: h.role === 'agent' ? 'assistant' : 'user',
-    content: h.mensagem,
-  }));
-  messages.push({ role: 'user', content: mensagemUsuario });
-
+async function chamarClaude(env, historico, mensagemUsuario, lead) {
+  const ctx = lead.ambiente ? `\n\nContexto: lead quer ${lead.ambiente}.` : '';
+  const messages = [
+    ...historico.map(h => ({ role: h.role === 'agent' ? 'assistant' : 'user', content: h.mensagem })),
+    { role: 'user', content: mensagemUsuario },
+  ];
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT + contextoLead,
-      messages,
-    }),
+    headers: { 'Content-Type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, system: SYSTEM_PROMPT + ctx, messages }),
   });
-
-  if (!res.ok) throw new Error(`Claude API error: ${await res.text()}`);
-  const result = await res.json();
-  return result.content[0].text;
+  if (!res.ok) throw new Error(await res.text());
+  return (await res.json()).content[0].text;
 }
 
-function parseRespostaClaude(texto) {
+function parseClaude(texto) {
   const idx = texto.indexOf('---JSON---');
   if (idx === -1) return { mensagem: texto.trim(), dados: null };
-  const mensagem = texto.slice(0, idx).trim();
-  try {
-    return { mensagem, dados: JSON.parse(texto.slice(idx + 10).trim()) };
-  } catch {
-    return { mensagem, dados: null };
-  }
+  try { return { mensagem: texto.slice(0, idx).trim(), dados: JSON.parse(texto.slice(idx + 10).trim()) }; }
+  catch { return { mensagem: texto.slice(0, idx).trim(), dados: null }; }
 }
 
 // ─── Handlers ─────────────────────────────────────────────────────────────────
 
-async function handleWebhookLead(request, env) {
-  let body;
-  try { body = await request.json(); }
-  catch { return json({ error: 'JSON inválido' }, 400); }
-
+async function handleWebhookLead(req, env) {
+  const body = await req.json().catch(() => null);
+  if (!body) return json({ error: 'JSON inválido' }, 400);
   const { nome, telefone, email, ambiente, mensagem } = body;
-  if (!nome || !telefone) return json({ error: 'nome e telefone são obrigatórios' }, 400);
+  if (!nome || !telefone) return json({ error: 'nome e telefone obrigatórios' }, 400);
 
   let lead = await buscarLeadPorTelefone(env, telefone);
-
   if (!lead) {
-    lead = await criarLead(env, {
-      nome, telefone,
-      email: email || null,
-      ambiente: ambiente || null,
-      mensagem: mensagem || null,
-      status: 'novo',
-      agente_ativo: true,
-      origem: 'site',
-    });
+    lead = await criarLead(env, { nome, telefone, email: email || null, ambiente: ambiente || null, mensagem: mensagem || null, status: 'novo', agente_ativo: true, origem: 'site' });
   } else if (!lead.agente_ativo) {
     await atualizarLead(env, lead.id, { agente_ativo: true });
   }
-
   if (!lead) return json({ error: 'Erro ao criar lead' }, 500);
 
   if (mensagem) await salvarMensagem(env, lead.id, 'user', mensagem);
 
   const primeiraMsg = ambiente
-    ? `Olá ${nome}! Vi que você tem interesse em ${ambiente}. Que ótima escolha! 😊 É para uma obra nova ou reforma?`
-    : `Olá ${nome}! Sou a assistente virtual da Realizzare Planejados. Para te ajudar melhor, qual ambiente você quer transformar? (cozinha, closet, dormitório, sala...)`;
+    ? `Olá ${nome}! Vi que você tem interesse em ${ambiente}. Que ótima escolha! 😊 É para obra nova ou reforma?`
+    : `Olá ${nome}! Sou a assistente virtual da Realizzare Planejados. Qual ambiente você quer transformar? (cozinha, closet, dormitório, sala...)`;
 
   await salvarMensagem(env, lead.id, 'agent', primeiraMsg);
   await enviarWhatsApp(env, telefone, primeiraMsg);
-
   return json({ ok: true, lead_id: lead.id });
 }
 
-async function handleWebhookWhatsApp(request, env) {
-  let body;
-  try { body = await request.json(); }
-  catch { return json({ error: 'JSON inválido' }, 400); }
+async function handleWebhookWhatsApp(req, env) {
+  const body = await req.json().catch(() => null);
+  if (!body) return json({ error: 'JSON inválido' }, 400);
 
   const data = body.data || body;
-  if (data.key?.fromMe || data.fromMe) return json({ ok: true, skipped: 'mensagem própria' });
+  if (data.key?.fromMe || data.fromMe) return json({ ok: true, skipped: 'própria' });
 
   const remoteJid = data.key?.remoteJid || data.remoteJid || '';
-  const telefoneRaw = remoteJid.replace('@s.whatsapp.net', '').replace('@c.us', '');
-  const textoMensagem =
-    data.message?.conversation ||
-    data.message?.extendedTextMessage?.text ||
-    data.message?.buttonsResponseMessage?.selectedDisplayText || '';
+  const telefone = remoteJid.replace('@s.whatsapp.net', '').replace('@c.us', '');
+  const texto = data.message?.conversation || data.message?.extendedTextMessage?.text || '';
 
-  if (!textoMensagem || !telefoneRaw) return json({ ok: true, skipped: 'sem texto' });
+  if (!texto || !telefone) return json({ ok: true, skipped: 'sem texto' });
 
-  let lead = await buscarLeadPorTelefone(env, telefoneRaw);
-  if (!lead) {
-    lead = await criarLead(env, {
-      nome: data.pushName || 'Lead WhatsApp',
-      telefone: telefoneRaw,
-      status: 'novo',
-      agente_ativo: true,
-      origem: 'whatsapp',
-    });
-  }
-  if (!lead) return json({ error: 'Erro ao localizar lead' }, 500);
+  let lead = await buscarLeadPorTelefone(env, telefone);
+  if (!lead) lead = await criarLead(env, { nome: data.pushName || 'Lead WhatsApp', telefone, status: 'novo', agente_ativo: true, origem: 'whatsapp' });
+  if (!lead) return json({ error: 'Erro lead' }, 500);
   if (!lead.agente_ativo) return json({ ok: true, skipped: 'agente pausado' });
 
   const historico = await buscarHistorico(env, lead.id);
-  await salvarMensagem(env, lead.id, 'user', textoMensagem);
+  await salvarMensagem(env, lead.id, 'user', texto);
 
   let respostaBruta;
-  try { respostaBruta = await chamarClaude(env, historico, textoMensagem, lead); }
-  catch (err) { console.error('Erro Claude:', err); return json({ error: 'Erro IA' }, 500); }
+  try { respostaBruta = await chamarClaude(env, historico, texto, lead); }
+  catch (err) { console.error(err); return json({ error: 'Erro IA' }, 500); }
 
-  const { mensagem: respostaFinal, dados } = parseRespostaClaude(respostaBruta);
-  await salvarMensagem(env, lead.id, 'agent', respostaFinal);
+  const { mensagem, dados } = parseClaude(respostaBruta);
+  await salvarMensagem(env, lead.id, 'agent', mensagem);
 
   if (dados) {
     const upd = {};
@@ -270,10 +199,25 @@ async function handleWebhookWhatsApp(request, env) {
     if (dados.orcamento_faixa) upd.orcamento_faixa = dados.orcamento_faixa;
     if (dados.prazo_desejado) upd.prazo_desejado = dados.prazo_desejado;
     if (dados.qualificado === true) { upd.qualificado = true; upd.status = 'qualificado'; }
-    if (Object.keys(upd).length > 0) await atualizarLead(env, lead.id, upd);
+    if (Object.keys(upd).length) await atualizarLead(env, lead.id, upd);
   }
 
-  await enviarWhatsApp(env, telefoneRaw, respostaFinal);
+  await enviarWhatsApp(env, telefone, mensagem);
+  return json({ ok: true });
+}
+
+// Consultor envia mensagem manual pelo painel
+async function handleEnviarMensagem(req, env) {
+  const body = await req.json().catch(() => null);
+  if (!body) return json({ error: 'JSON inválido' }, 400);
+  const { lead_id, mensagem } = body;
+  if (!lead_id || !mensagem) return json({ error: 'lead_id e mensagem obrigatórios' }, 400);
+
+  const lead = await buscarLeadPorId(env, lead_id);
+  if (!lead) return json({ error: 'Lead não encontrado' }, 404);
+
+  await salvarMensagem(env, lead_id, 'agent', mensagem);
+  await enviarWhatsApp(env, lead.telefone, mensagem);
   return json({ ok: true });
 }
 
@@ -281,14 +225,12 @@ async function handleWebhookWhatsApp(request, env) {
 
 export default {
   async fetch(request, env) {
-    if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders() });
-
+    if (request.method === 'OPTIONS') return new Response(null, { headers: cors() });
     const path = new URL(request.url).pathname;
-
-    if (request.method === 'POST' && path === '/webhook-lead')      return handleWebhookLead(request, env);
-    if (request.method === 'POST' && path === '/webhook-whatsapp')  return handleWebhookWhatsApp(request, env);
+    if (request.method === 'POST' && path === '/webhook-lead')     return handleWebhookLead(request, env);
+    if (request.method === 'POST' && path === '/webhook-whatsapp') return handleWebhookWhatsApp(request, env);
+    if (request.method === 'POST' && path === '/enviar-mensagem')  return handleEnviarMensagem(request, env);
     if (path === '/health') return json({ ok: true });
-
     return json({ error: 'Rota não encontrada' }, 404);
   },
 };
