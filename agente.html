@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CRM — Realizzare Planejados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -32,7 +32,7 @@
   --amber:#c08840;
   --amber-dim:rgba(192,136,64,.1);
   --blue:#5080c0;
-  --font-display:'Cormorant',serif;
+  --font-display:'Syne',sans-serif;
   --font-ui:'Outfit',sans-serif;
   --font-mono:'JetBrains Mono',monospace;
 }
@@ -54,8 +54,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 }
 .brand{padding:28px 22px 20px;border-bottom:1px solid var(--border)}
 .brand-name{
-  font-family:var(--font-display);font-size:20px;font-weight:600;
-  letter-spacing:.05em;color:var(--gold);font-style:italic;line-height:1;
+  font-family:var(--font-display);font-size:18px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--gold);line-height:1;
 }
 .brand-sub{
   font-family:var(--font-ui);font-size:9px;letter-spacing:.25em;
@@ -125,8 +125,8 @@ nav{flex:1;padding:16px 12px}
   padding:0 28px;height:48px;display:flex;align-items:center;gap:16px;flex-shrink:0;
 }
 .topbar-title{
-  font-family:var(--font-display);font-size:18px;font-style:italic;
-  color:var(--cream);letter-spacing:.02em;flex:1;
+  font-family:var(--font-display);font-size:16px;font-weight:700;
+  color:var(--cream);letter-spacing:.1em;text-transform:uppercase;flex:1;
 }
 .topbar-clock{
   font-family:var(--font-mono);font-size:11px;color:var(--muted);
@@ -294,8 +294,8 @@ nav{flex:1;padding:16px 12px}
   width:36px;height:36px;border-radius:2px;flex-shrink:0;
   background:var(--s3);border:1px solid var(--border2);
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-display);font-size:16px;font-style:italic;
-  color:var(--gold);text-transform:uppercase;
+  font-family:var(--font-display);font-size:14px;font-weight:700;
+  color:var(--gold);text-transform:uppercase;letter-spacing:.05em;
 }
 .conv-body{flex:1;min-width:0}
 .conv-r1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
@@ -342,8 +342,8 @@ nav{flex:1;padding:16px 12px}
   display:flex;align-items:flex-start;gap:12px;flex-shrink:0;
 }
 .lp-name{
-  font-family:var(--font-display);font-size:22px;font-style:italic;
-  color:var(--cream);line-height:1;flex:1;
+  font-family:var(--font-display);font-size:20px;font-weight:700;
+  color:var(--cream);line-height:1;flex:1;letter-spacing:.03em;
 }
 .lp-badges{margin-top:5px;display:flex;gap:5px;flex-wrap:wrap}
 .lp-tabs{
