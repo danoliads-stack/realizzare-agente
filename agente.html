@@ -3,265 +3,513 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CRM Agente — Realizzare</title>
+<title>CRM — Realizzare Planejados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#141414;--s1:#1e1e1e;--s2:#272727;--s3:#303030;
-  --border:#2e2e2e;--border2:#3a3a3a;
-  --gold:#c9a84c;--gold2:#f0c040;--gold-dim:rgba(201,168,76,.12);
-  --text:#e8e8e8;--muted:#777;--muted2:#555;
-  --green:#52c07a;--red:#e05252;--orange:#e0993a;--blue:#5ba4f5;
-  --green-dim:rgba(82,192,122,.12);--red-dim:rgba(224,82,82,.12);--orange-dim:rgba(224,153,58,.12);
+  --bg:#080808;
+  --s1:#101010;
+  --s2:#181818;
+  --s3:#202020;
+  --s4:#282828;
+  --border:#222;
+  --border2:#2e2e2e;
+  --gold:#c9a84c;
+  --gold2:#e8c46a;
+  --gold-dim:rgba(201,168,76,.08);
+  --gold-dim2:rgba(201,168,76,.15);
+  --cream:#f0ebe0;
+  --text:#d8d3c8;
+  --muted:#5a5550;
+  --muted2:#3a3530;
+  --green:#4caf80;
+  --green-dim:rgba(76,175,128,.1);
+  --red:#c05050;
+  --red-dim:rgba(192,80,80,.1);
+  --amber:#c08840;
+  --amber-dim:rgba(192,136,64,.1);
+  --blue:#5080c0;
+  --font-display:'Cormorant',serif;
+  --font-ui:'Outfit',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:13px;line-height:1.5;overflow:hidden}
 
 /* ── Sidebar ─────────────────────────────────────────────── */
-.sidebar{width:220px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
-.sidebar-logo .name{font-size:15px;font-weight:700;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase}
-.sidebar-logo .sub{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.sidebar-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);color:var(--gold);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-top:8px}
-.sidebar-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
-nav{flex:1;padding:12px 10px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:.15s;position:relative;user-select:none}
-.nav-item:hover{background:var(--s2);color:var(--text)}
-.nav-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
-.nav-icon{font-size:16px;width:20px;text-align:center}
-.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
-.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border)}
-.user-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px}
-.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:12px;font-weight:700;flex-shrink:0}
-.user-email{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn-sair{width:100%;margin-top:6px;background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--muted);font-size:12px;padding:7px;cursor:pointer;transition:.15s}
+.layout{display:flex;height:100vh}
+.sidebar{
+  width:200px;flex-shrink:0;
+  background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:relative;
+}
+.sidebar::after{
+  content:'';position:absolute;top:0;right:0;width:1px;height:100%;
+  background:linear-gradient(to bottom,transparent,var(--gold),transparent);
+  opacity:.15;
+}
+.brand{padding:28px 22px 20px;border-bottom:1px solid var(--border)}
+.brand-name{
+  font-family:var(--font-display);font-size:20px;font-weight:600;
+  letter-spacing:.05em;color:var(--gold);font-style:italic;line-height:1;
+}
+.brand-sub{
+  font-family:var(--font-ui);font-size:9px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--muted);margin-top:5px;
+}
+.brand-tag{
+  display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+  font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--border2);
+  border-radius:2px;padding:3px 8px;
+}
+.brand-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+
+nav{flex:1;padding:16px 12px}
+.nav-section{
+  font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted2);padding:0 10px;margin-bottom:6px;margin-top:16px;
+}
+.nav-section:first-child{margin-top:0}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:3px;cursor:pointer;
+  color:var(--muted);font-size:12px;font-weight:400;
+  transition:color .15s,background .15s;
+  position:relative;user-select:none;letter-spacing:.01em;
+}
+.nav-item:hover{color:var(--text);background:var(--s2)}
+.nav-item.active{
+  color:var(--gold);background:var(--gold-dim);
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:25%;bottom:25%;
+  width:2px;background:var(--gold);border-radius:0 1px 1px 0;
+}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{
+  margin-left:auto;background:var(--gold);color:#080808;
+  font-family:var(--font-mono);font-size:9px;font-weight:600;
+  padding:1px 5px;border-radius:2px;min-width:16px;text-align:center;
+  display:none;
+}
+
+.sidebar-foot{padding:14px 12px;border-top:1px solid var(--border)}
+.user-block{display:flex;align-items:center;gap:8px;padding:6px 8px}
+.user-av{
+  width:26px;height:26px;border-radius:2px;
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:13px;color:var(--gold);font-style:italic;
+}
+.user-email{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.btn-sair{
+  width:100%;margin-top:8px;
+  background:transparent;border:1px solid var(--border2);
+  border-radius:2px;color:var(--muted);font-size:11px;
+  font-family:var(--font-ui);padding:6px;cursor:pointer;
+  letter-spacing:.05em;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
 .btn-sair:hover{border-color:var(--red);color:var(--red)}
 
 /* ── Main ────────────────────────────────────────────────── */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.topbar-title{font-size:15px;font-weight:700;flex:1}
-.topbar-time{font-size:11px;color:var(--muted)}
-.content{flex:1;overflow-y:auto;padding:24px}
-
-/* ── Botões ──────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:.15s}
-.btn-gold{background:var(--gold);color:#111}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{
+  background:var(--s1);border-bottom:1px solid var(--border);
+  padding:0 28px;height:48px;display:flex;align-items:center;gap:16px;flex-shrink:0;
+}
+.topbar-title{
+  font-family:var(--font-display);font-size:18px;font-style:italic;
+  color:var(--cream);letter-spacing:.02em;flex:1;
+}
+.topbar-clock{
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  letter-spacing:.05em;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:2px;border:none;
+  cursor:pointer;font-size:11px;font-weight:500;
+  font-family:var(--font-ui);letter-spacing:.05em;transition:.15s;
+}
+.btn-gold{background:var(--gold);color:#080808}
 .btn-gold:hover{background:var(--gold2)}
 .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--muted)}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
-.btn-green{background:var(--green-dim);border:1px solid rgba(82,192,122,.3);color:var(--green)}
-.btn-red{background:var(--red-dim);border:1px solid rgba(224,82,82,.3);color:var(--red)}
-.btn-sm{padding:5px 10px;font-size:11px}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-green{background:var(--green-dim);border:1px solid rgba(76,175,128,.25);color:var(--green)}
+.btn-green:hover{background:rgba(76,175,128,.18)}
+.btn-red{background:var(--red-dim);border:1px solid rgba(192,80,80,.25);color:var(--red)}
+.btn-red:hover{background:rgba(192,80,80,.18)}
+.btn-sm{padding:5px 10px;font-size:10px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
 
-/* ── KPI Cards ───────────────────────────────────────────── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
-.kpi{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
-.kpi-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.kpi-val{font-size:26px;font-weight:800;line-height:1}
+.content{flex:1;overflow-y:auto;padding:28px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── KPI ─────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.kpi{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:3px;padding:16px 18px;position:relative;overflow:hidden;
+}
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,var(--gold),transparent);
+  opacity:0;transition:.3s;
+}
+.kpi:hover::before{opacity:.4}
+.kpi-label{
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;
+}
+.kpi-val{
+  font-family:var(--font-mono);font-size:24px;font-weight:600;
+  line-height:1;color:var(--cream);
+}
 .kpi-val.gold{color:var(--gold)}
 .kpi-val.green{color:var(--green)}
-.kpi-val.red{color:var(--red)}
-.kpi-val.orange{color:var(--orange)}
-.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px}
-.kpi-trend{font-size:10px;margin-top:6px}
-.kpi-trend.up{color:var(--green)}
-.kpi-trend.down{color:var(--red)}
+.kpi-val.amber{color:var(--amber)}
+.kpi-sub{font-size:9px;color:var(--muted);margin-top:5px;letter-spacing:.05em}
 
 /* ── Seção ───────────────────────────────────────────────── */
-.section{background:var(--s1);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden}
-.section-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.section-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.section{background:var(--s1);border:1px solid var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.section-head{
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-label{
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+}
 .section-body{padding:16px 18px}
 
 /* ── Funil ───────────────────────────────────────────────── */
-.funil{display:flex;gap:4px;align-items:flex-end}
+.funil{display:flex;align-items:flex-end;gap:3px}
 .funil-col{flex:1;text-align:center}
-.funil-bar-wrap{height:56px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px}
-.funil-bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(to top,var(--gold),rgba(201,168,76,.25));min-height:3px}
-.funil-n{font-size:15px;font-weight:800;color:var(--gold)}
-.funil-lbl{font-size:9px;color:var(--muted);letter-spacing:.5px;margin-top:2px}
-.funil-sep{color:var(--border2);padding-bottom:30px;font-size:14px;flex-shrink:0}
+.funil-bar-wrap{height:52px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:5px}
+.funil-bar{
+  width:100%;border-radius:1px 1px 0 0;min-height:2px;
+  background:linear-gradient(to top,var(--gold),rgba(201,168,76,.2));
+}
+.funil-n{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--gold)}
+.funil-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.funil-sep{color:var(--border2);font-size:12px;padding-bottom:28px;flex-shrink:0}
 
-/* ── Feed atividade ──────────────────────────────────────── */
-.feed{display:flex;flex-direction:column;gap:2px}
-.feed-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+/* ── Feed ────────────────────────────────────────────────── */
+.feed{display:flex;flex-direction:column}
+.feed-item{
+  display:flex;align-items:baseline;gap:10px;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  cursor:pointer;transition:.1s;
+}
+.feed-item:hover{padding-left:4px}
 .feed-item:last-child{border-bottom:none}
-.feed-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.feed-dot.green{background:var(--green)}
-.feed-dot.gold{background:var(--gold)}
-.feed-dot.blue{background:var(--blue)}
-.feed-dot.red{background:var(--red)}
-.feed-text{flex:1;font-size:12px;line-height:1.4;color:var(--text)}
-.feed-text strong{color:var(--gold)}
-.feed-time{font-size:10px;color:var(--muted);white-space:nowrap;margin-top:1px}
+.feed-line{width:1px;height:12px;background:var(--border2);flex-shrink:0;margin-top:2px}
+.feed-text{flex:1;font-size:12px;color:var(--text);line-height:1.4}
+.feed-text b{color:var(--cream);font-weight:500}
+.feed-time{font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap}
 
 /* ── Alertas ─────────────────────────────────────────────── */
-.alerta{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:.15s}
-.alerta:hover{filter:brightness(1.1)}
-.alerta.vermelho{background:var(--red-dim);border:1px solid rgba(224,82,82,.25)}
-.alerta.laranja{background:var(--orange-dim);border:1px solid rgba(224,153,58,.25)}
-.alerta-icon{font-size:16px;flex-shrink:0}
-.alerta-body{flex:1}
-.alerta-nome{font-size:12px;font-weight:600}
-.alerta-detalhe{font-size:11px;color:var(--muted)}
-.alerta-tempo{font-size:11px;font-weight:700}
-.alerta.vermelho .alerta-tempo{color:var(--red)}
-.alerta.laranja .alerta-tempo{color:var(--orange)}
+.alerta{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:2px;margin-bottom:6px;
+  cursor:pointer;transition:filter .15s;
+}
+.alerta:hover{filter:brightness(1.15)}
+.alerta.crit{background:var(--red-dim);border-left:2px solid var(--red)}
+.alerta.warn{background:var(--amber-dim);border-left:2px solid var(--amber)}
+.alerta-nome{font-size:12px;font-weight:500;color:var(--cream)}
+.alerta-det{font-size:10px;color:var(--muted);margin-top:1px}
+.alerta-badge{
+  margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:600;
+  white-space:nowrap;padding:2px 7px;border-radius:2px;
+}
+.alerta.crit .alerta-badge{background:var(--red-dim);color:var(--red)}
+.alerta.warn .alerta-badge{background:var(--amber-dim);color:var(--amber)}
 
 /* ── Kanban ──────────────────────────────────────────────── */
-.kanban-wrap{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;min-height:500px}
-.kanban-col{background:var(--s1);border:1px solid var(--border);border-radius:10px;width:240px;flex-shrink:0;display:flex;flex-direction:column;max-height:calc(100vh - 160px)}
-.kanban-col-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
-.kanban-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.kanban-col-name{font-size:12px;font-weight:700;flex:1}
-.kanban-col-count{background:var(--s3);color:var(--muted);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px}
-.kanban-cards{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
-.kanban-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:.15s}
-.kanban-card:hover{border-color:var(--gold);transform:translateY(-1px)}
-.kanban-card-nome{font-size:13px;font-weight:700;margin-bottom:4px}
-.kanban-card-tel{font-size:11px;color:var(--muted);margin-bottom:6px}
-.kanban-card-amb{display:inline-flex;align-items:center;gap:4px;background:var(--gold-dim);color:var(--gold);font-size:10px;padding:2px 7px;border-radius:10px;margin-bottom:8px}
-.kanban-card-footer{display:flex;align-items:center;justify-content:space-between}
-.kanban-card-tempo{font-size:10px;color:var(--muted)}
-.kanban-card-tempo.alerta{color:var(--orange)}
-.kanban-card-tempo.critico{color:var(--red)}
-.badge-agente{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green);letter-spacing:.5px}
-.badge-agente::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green)}
-.badge-consultor{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--orange);letter-spacing:.5px}
-.badge-consultor::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--orange)}
-.kanban-empty{text-align:center;padding:30px 10px;color:var(--muted2);font-size:12px}
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;min-height:520px;align-items:flex-start}
+.k-col{
+  background:var(--s1);border:1px solid var(--border);border-radius:3px;
+  width:230px;flex-shrink:0;display:flex;flex-direction:column;
+  max-height:calc(100vh - 140px);
+}
+.k-col-head{
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.k-col-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.k-col-name{
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:600;flex:1;color:var(--text);
+}
+.k-col-n{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--muted);background:var(--s3);
+  padding:1px 6px;border-radius:2px;
+}
+.k-cards{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
+.k-card{
+  background:var(--s2);border:1px solid var(--border);border-radius:2px;
+  padding:12px;cursor:pointer;transition:border-color .15s,transform .15s;
+}
+.k-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.k-card-name{font-size:13px;font-weight:500;color:var(--cream);margin-bottom:3px}
+.k-card-phone{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:8px}
+.k-card-amb{
+  display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(201,168,76,.2);
+  padding:1px 6px;border-radius:1px;margin-bottom:8px;
+}
+.k-card-foot{display:flex;align-items:center;justify-content:space-between}
+.k-card-age{font-family:var(--font-mono);font-size:9px;color:var(--muted)}
+.k-card-age.warn{color:var(--amber)}
+.k-card-age.crit{color:var(--red)}
+.k-tag{
+  font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  padding:1px 5px;border-radius:1px;font-weight:600;
+}
+.k-tag.agente{background:var(--green-dim);color:var(--green)}
+.k-tag.consultor{background:var(--amber-dim);color:var(--amber)}
+.k-empty{text-align:center;padding:24px 8px;color:var(--muted2);font-size:11px}
 
 /* ── Ao vivo ─────────────────────────────────────────────── */
-.ao-vivo-grid{display:flex;flex-direction:column;gap:8px}
-.conv-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:.15s;display:flex;gap:12px;align-items:flex-start}
-.conv-card:hover{border-color:var(--gold)}
-.conv-card.nova{border-color:var(--green);animation:pulse-border 1.5s infinite}
-@keyframes pulse-border{0%,100%{border-color:var(--green)}50%{border-color:rgba(82,192,122,.3)}}
-.conv-avatar{width:38px;height:38px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--gold);flex-shrink:0;text-transform:uppercase}
+.ao-vivo-list{display:flex;flex-direction:column;gap:6px}
+.conv{
+  background:var(--s1);border:1px solid var(--border);border-radius:3px;
+  padding:14px 16px;cursor:pointer;transition:border-color .15s;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.conv:hover{border-color:rgba(201,168,76,.3)}
+.conv.nova{
+  border-color:var(--green);
+  box-shadow:0 0 0 1px rgba(76,175,128,.1);
+}
+.conv-av{
+  width:36px;height:36px;border-radius:2px;flex-shrink:0;
+  background:var(--s3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:16px;font-style:italic;
+  color:var(--gold);text-transform:uppercase;
+}
 .conv-body{flex:1;min-width:0}
-.conv-row1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
-.conv-nome{font-size:13px;font-weight:700}
-.conv-status-badge{font-size:9px;padding:1px 7px;border-radius:10px;font-weight:700}
-.conv-preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.conv-meta{display:flex;align-items:center;gap:8px}
-.conv-tempo{font-size:10px;color:var(--muted)}
-.conv-tempo.alerta{color:var(--orange)}
-.conv-tempo.critico{color:var(--red)}
-.conv-qual{font-size:9px;color:var(--green);font-weight:600}
-.conv-new-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px;box-shadow:0 0 6px var(--green)}
-.ao-vivo-empty{text-align:center;padding:60px 20px;color:var(--muted)}
-.ao-vivo-empty .icon{font-size:48px;margin-bottom:12px}
-
-/* ── Painel Lead (direita) ───────────────────────────────── */
-.lead-overlay{position:fixed;inset:0;z-index:200;display:none}
-.lead-overlay.open{display:flex;justify-content:flex-end}
-.lead-backdrop{flex:1;background:rgba(0,0,0,.5);backdrop-filter:blur(2px)}
-.lead-panel{width:520px;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.lead-panel-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.lead-panel-nome{flex:1;font-size:16px;font-weight:700}
-.lead-panel-tabs{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.lead-tab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
-.lead-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.lead-tab-content{flex:1;overflow-y:auto;display:none}
-.lead-tab-content.active{display:flex;flex-direction:column}
-
-/* Info do lead */
-.lead-info{padding:20px}
-.info-section-title{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;margin-top:16px}
-.info-section-title:first-child{margin-top:0}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.info-item label{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
-.info-item p{font-size:13px;margin-top:2px}
-.info-item.full{grid-column:1/-1}
-.status-sel{background:var(--s2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:6px 10px;width:100%;outline:none;cursor:pointer}
-.status-sel:focus{border-color:var(--gold)}
-.notas-area{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:10px 12px;resize:none;outline:none;font-family:inherit;min-height:80px;margin-top:6px}
-.notas-area:focus{border-color:var(--gold)}
-.btn-salvar-notas{margin-top:6px}
-
-/* Chat */
-.chat-area{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
-.chat-msg{max-width:78%}
-.chat-msg.agent{align-self:flex-start}
-.chat-msg.user{align-self:flex-end}
-.chat-bubble{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}
-.chat-msg.agent .chat-bubble{background:var(--s2);border-bottom-left-radius:3px}
-.chat-msg.user .chat-bubble{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2);border-bottom-right-radius:3px}
-.chat-time{font-size:10px;color:var(--muted);margin-top:3px;padding:0 3px}
-.chat-msg.user .chat-time{text-align:right}
-.chat-footer{padding:14px 16px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0}
-.chat-assumir{text-align:center;padding:16px}
-.chat-input-wrap{display:flex;gap:8px}
-.chat-input{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 12px;outline:none;font-family:inherit;resize:none;max-height:100px}
-.chat-input:focus{border-color:var(--gold)}
-.chat-send{background:var(--gold);color:#111;border:none;border-radius:8px;padding:9px 14px;cursor:pointer;font-size:16px;transition:.15s;flex-shrink:0}
-.chat-send:hover{background:var(--gold2)}
-.chat-send:disabled{opacity:.4;cursor:not-allowed}
-.chat-consultor-label{font-size:11px;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.chat-consultor-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--orange)}
-.chat-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.conv-r1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.conv-name{font-size:13px;font-weight:500;color:var(--cream)}
+.conv-preview{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.conv-meta{display:flex;align-items:center;gap:10px}
+.conv-age{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+.conv-age.warn{color:var(--amber)}
+.conv-age.crit{color:var(--red)}
+.conv-qual{font-size:9px;font-weight:600;letter-spacing:.05em;color:var(--green)}
+.conv-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;box-shadow:0 0 4px currentColor}
+.conv-dot.green{color:var(--green);background:var(--green)}
+.conv-dot.amber{color:var(--amber);background:var(--amber)}
+.new-pip{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px;box-shadow:0 0 6px var(--green);animation:glow 1.2s infinite alternate}
+@keyframes glow{from{opacity:.6}to{opacity:1}}
 
 /* ── Badges de status ────────────────────────────────────── */
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.b-novo{background:rgba(120,120,120,.15);color:#999}
-.b-atendimento{background:var(--gold-dim);color:var(--gold)}
+.badge{
+  display:inline-block;font-size:8px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:2px 7px;border-radius:1px;
+}
+.b-novo{background:rgba(90,90,80,.2);color:#888}
+.b-atendimento{background:var(--gold-dim2);color:var(--gold)}
 .b-qualificado{background:var(--green-dim);color:var(--green)}
-.b-agendado{background:rgba(82,192,122,.25);color:var(--green)}
-.b-proposta{background:rgba(91,164,245,.12);color:var(--blue)}
-.b-fechado{background:rgba(82,192,122,.4);color:#0a2a15;font-weight:800}
+.b-agendado{background:rgba(76,175,128,.2);color:var(--green)}
+.b-proposta{background:rgba(80,128,192,.12);color:var(--blue)}
+.b-fechado{background:rgba(76,175,128,.35);color:#f0ebe0;font-weight:800}
 .b-perdido{background:var(--red-dim);color:var(--red)}
 
-/* ── Loading / Empty ─────────────────────────────────────── */
-.loading{text-align:center;padding:48px;color:var(--muted);font-size:13px}
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty .eicon{font-size:48px;margin-bottom:12px}
+/* ── Painel lead ─────────────────────────────────────────── */
+.lead-overlay{position:fixed;inset:0;z-index:300;display:none}
+.lead-overlay.open{display:flex;justify-content:flex-end}
+.lead-back{flex:1;background:rgba(0,0,0,.6);backdrop-filter:blur(3px)}
+.lead-panel{
+  width:500px;background:var(--s1);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  animation:slidePanel .2s ease;
+}
+@keyframes slidePanel{from{transform:translateX(20px);opacity:.5}to{transform:translateX(0);opacity:1}}
+.lp-head{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;flex-shrink:0;
+}
+.lp-name{
+  font-family:var(--font-display);font-size:22px;font-style:italic;
+  color:var(--cream);line-height:1;flex:1;
+}
+.lp-badges{margin-top:5px;display:flex;gap:5px;flex-wrap:wrap}
+.lp-tabs{
+  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;
+  padding:0 22px;
+}
+.lp-tab{
+  padding:10px 14px;font-size:10px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+  border-bottom:1px solid transparent;margin-bottom:-1px;transition:.15s;
+}
+.lp-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.lp-body{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.lp-body.active{display:flex}
+
+/* Info */
+.lp-info{padding:20px 22px}
+.info-ruler{height:1px;background:var(--border);margin:16px 0}
+.info-cat{
+  font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;
+}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ii label{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:3px;
+}
+.ii p{font-size:13px;color:var(--cream)}
+.ii.full{grid-column:1/-1}
+.ii a{color:var(--gold);text-decoration:none}
+.ii a:hover{text-decoration:underline}
+.status-sel{
+  width:100%;background:var(--s2);border:1px solid var(--border2);
+  border-radius:2px;color:var(--text);font-size:12px;
+  font-family:var(--font-ui);padding:6px 10px;outline:none;cursor:pointer;
+  transition:.15s;
+}
+.status-sel:focus{border-color:var(--gold)}
+textarea.notas{
+  width:100%;background:var(--s2);border:1px solid var(--border2);
+  border-radius:2px;color:var(--text);font-size:12px;
+  font-family:var(--font-ui);padding:8px 10px;outline:none;
+  resize:none;min-height:72px;line-height:1.5;transition:.15s;
+  margin-top:6px;
+}
+textarea.notas:focus{border-color:var(--gold)}
+.acoes-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+
+/* Chat */
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:7px;background:var(--bg)}
+.cm{max-width:76%}
+.cm.agent{align-self:flex-start}
+.cm.user{align-self:flex-end}
+.cm-bub{
+  padding:9px 13px;font-size:12px;line-height:1.55;
+  border-radius:2px;word-break:break-word;
+}
+.cm.agent .cm-bub{background:var(--s2);border:1px solid var(--border)}
+.cm.user .cm-bub{
+  background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.15);
+}
+.cm-time{
+  font-family:var(--font-mono);font-size:9px;
+  color:var(--muted);margin-top:3px;padding:0 2px;
+}
+.cm.user .cm-time{text-align:right}
+.chat-foot{padding:14px 16px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.chat-assumir{text-align:center;padding:14px}
+.chat-assumir p{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.chat-ctrl{margin-bottom:8px}
+.ctrl-label{
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:7px;
+  display:flex;align-items:center;gap:5px;
+}
+.ctrl-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--amber)}
+.chat-row{display:flex;gap:7px}
+.chat-inp{
+  flex:1;background:var(--s2);border:1px solid var(--border2);
+  border-radius:2px;color:var(--text);font-size:12px;
+  font-family:var(--font-ui);padding:8px 12px;outline:none;
+  resize:none;max-height:90px;line-height:1.5;transition:.15s;
+}
+.chat-inp:focus{border-color:var(--gold)}
+.chat-send{
+  background:var(--gold);color:#080808;border:none;border-radius:2px;
+  padding:8px 13px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.chat-send:hover{background:var(--gold2)}
+.chat-send:disabled{opacity:.35;cursor:not-allowed}
+.chat-empty{text-align:center;padding:36px;color:var(--muted);font-size:12px}
 
 /* ── Notif ───────────────────────────────────────────────── */
-.notif-wrap{position:fixed;top:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:8px}
-.notif{background:var(--s1);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideIn .25s ease}
-.notif.red{border-color:var(--red)}
-.notif.green{border-color:var(--green)}
-.notif-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:2px}
-.notif.red .notif-title{color:var(--red)}
-.notif.green .notif-title{color:var(--green)}
-.notif-body{font-size:11px;color:var(--muted)}
-@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif-wrap{position:fixed;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.notif{
+  background:var(--s2);border:1px solid var(--border);
+  border-left:2px solid var(--gold);border-radius:2px;
+  padding:10px 14px;width:260px;
+  box-shadow:0 4px 24px rgba(0,0,0,.6);
+  animation:notifIn .2s ease;
+}
+.notif.green{border-left-color:var(--green)}
+.notif.red{border-left-color:var(--red)}
+.notif-t{font-size:11px;font-weight:600;color:var(--cream);margin-bottom:2px}
+.notif-b{font-size:10px;color:var(--muted)}
+@keyframes notifIn{from{transform:translateX(12px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar{width:4px;height:4px}
+/* ── Misc ────────────────────────────────────────────────── */
+.loading{text-align:center;padding:60px;color:var(--muted);font-size:12px;letter-spacing:.05em}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
 </head>
 <body>
+<div class="layout">
 
 <!-- Sidebar -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="name">Realizzare</div>
-    <div class="sub">Planejados</div>
-    <div class="sidebar-badge">Agente IA</div>
+  <div class="brand">
+    <div class="brand-name">Realizzare</div>
+    <div class="brand-sub">Planejados · CRM</div>
+    <div class="brand-tag"><span class="brand-tag-dot"></span>Agente IA</div>
   </div>
   <nav>
+    <div class="nav-section">Painel</div>
     <div class="nav-item active" data-view="dashboard" onclick="trocarView('dashboard')">
-      <span class="nav-icon">📊</span> Dashboard
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="1" width="6" height="6" rx=".5"/><rect x="9" y="1" width="6" height="6" rx=".5"/>
+        <rect x="1" y="9" width="6" height="6" rx=".5"/><rect x="9" y="9" width="6" height="6" rx=".5"/>
+      </svg>
+      Dashboard
     </div>
     <div class="nav-item" data-view="kanban" onclick="trocarView('kanban')">
-      <span class="nav-icon">🗂</span> Kanban
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="2" width="4" height="12" rx=".5"/>
+        <rect x="6" y="2" width="4" height="8" rx=".5"/>
+        <rect x="11" y="2" width="4" height="10" rx=".5"/>
+      </svg>
+      Kanban
     </div>
     <div class="nav-item" data-view="ao-vivo" onclick="trocarView('ao-vivo')">
-      <span class="nav-icon">⚡</span> Ao vivo
-      <span class="nav-badge" id="badge-ao-vivo" style="display:none">0</span>
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="8" cy="8" r="2.5"/>
+        <path d="M4 4a5.66 5.66 0 0 0 0 8M12 4a5.66 5.66 0 0 1 0 8"/>
+        <path d="M1.5 1.5a10.1 10.1 0 0 0 0 13M14.5 1.5a10.1 10.1 0 0 1 0 13"/>
+      </svg>
+      Ao vivo
+      <span class="nav-badge" id="badge-vivo">0</span>
     </div>
   </nav>
-  <div class="sidebar-footer">
-    <div class="user-row">
-      <div class="user-avatar" id="user-avatar">?</div>
+  <div class="sidebar-foot">
+    <div class="user-block">
+      <div class="user-av" id="user-av">?</div>
       <div class="user-email" id="user-email">—</div>
     </div>
-    <button class="btn-sair" onclick="sair()">Sair</button>
+    <button class="btn-sair" onclick="sair()">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l4-3-4-3M14 8H6"/>
+      </svg>
+      Sair
+    </button>
   </div>
 </aside>
 
@@ -269,79 +517,76 @@ nav{flex:1;padding:12px 10px}
 <div class="main">
   <div class="topbar">
     <div class="topbar-title" id="topbar-title">Dashboard</div>
-    <div class="topbar-time" id="topbar-time"></div>
-    <button class="btn btn-outline btn-sm" onclick="exportarCSV()">⬇ CSV</button>
+    <div class="topbar-clock" id="clock"></div>
+    <button class="btn btn-outline btn-sm" onclick="exportarCSV()">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 2v9M4 8l4 4 4-4M2 13h12"/>
+      </svg>
+      Exportar CSV
+    </button>
   </div>
-
-  <div class="content" id="content">
-    <div class="loading">Carregando…</div>
-  </div>
+  <div class="content" id="content"><div class="loading">Carregando</div></div>
 </div>
 
-<!-- Painel Lead (direita) -->
-<div class="lead-overlay" id="lead-overlay">
-  <div class="lead-backdrop" onclick="fecharLead()"></div>
+</div><!-- /layout -->
+
+<!-- Painel Lead -->
+<div class="lead-overlay" id="lo">
+  <div class="lead-back" onclick="fecharLead()"></div>
   <div class="lead-panel">
-    <div class="lead-panel-head">
+    <div class="lp-head">
       <div>
-        <div class="lead-panel-nome" id="lp-nome">—</div>
-        <div style="margin-top:4px" id="lp-badges"></div>
+        <div class="lp-name" id="lp-name">—</div>
+        <div class="lp-badges" id="lp-badges"></div>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="fecharLead()">✕</button>
+      <button class="btn btn-outline btn-sm" onclick="fecharLead()">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l12 12M14 2L2 14"/></svg>
+        Fechar
+      </button>
     </div>
-    <div class="lead-panel-tabs">
-      <div class="lead-tab active" onclick="trocarTab('info')">Informações</div>
-      <div class="lead-tab" onclick="trocarTab('chat')">Conversa</div>
+    <div class="lp-tabs">
+      <div class="lp-tab active" onclick="trocarTab('info')">Informações</div>
+      <div class="lp-tab" onclick="trocarTab('chat')">Conversa</div>
     </div>
-    <div class="lead-tab-content active" id="tab-info">
-      <div class="lead-info" id="lp-info"></div>
-    </div>
-    <div class="lead-tab-content" id="tab-chat" style="flex-direction:column">
-      <div class="chat-area" id="chat-area"></div>
-      <div class="chat-footer" id="chat-footer"></div>
+    <div class="lp-body active" id="tab-info"><div class="lp-info" id="lp-info"></div></div>
+    <div class="lp-body" id="tab-chat" style="flex-direction:column">
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-foot" id="chat-foot"></div>
     </div>
   </div>
 </div>
 
-<!-- Notificações -->
 <div class="notif-wrap" id="notif-wrap"></div>
 
 <script>
-// ─── Config ───────────────────────────────────────────────────────────────────
-const SUPABASE_URL     = 'https://xdecwdegfeczmyojrvrt.supabase.co';
-const SUPABASE_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkZWN3ZGVnZmVjem15b2pydnJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MjM1OTUsImV4cCI6MjA5MjE5OTU5NX0.mL2rhQnqYkFnzU_KUuFrpC30pkGBIedKYNRq-4eTI-0';
-const WORKER_URL       = 'https://realizzare-agente-worker.danoliads.workers.dev';
-
+const SUPABASE_URL  = 'https://xdecwdegfeczmyojrvrt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkZWN3ZGVnZmVjem15b2pydnJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MjM1OTUsImV4cCI6MjA5MjE5OTU5NX0.mL2rhQnqYkFnzU_KUuFrpC30pkGBIedKYNRq-4eTI-0';
+const WORKER_URL    = 'https://realizzare-agente-worker.danoliads.workers.dev';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ─── Estado ───────────────────────────────────────────────────────────────────
-let todos = [];
-let leadAtual = null;
-let viewAtual = 'dashboard';
-let sessao = null;
-let novasMensagens = new Set(); // lead_ids com msgs novas
+let todos = [], leadAtual = null, sessao = null, novas = new Set(), viewAtual = 'dashboard';
 
 const ETAPAS = [
-  { key:'novo',        label:'Novo',           dot:'#888' },
-  { key:'atendimento', label:'Atendimento',     dot:'#c9a84c' },
-  { key:'qualificado', label:'Qualificado',     dot:'#52c07a' },
-  { key:'agendado',    label:'Visita agendada', dot:'#52c07a' },
-  { key:'proposta',    label:'Proposta',        dot:'#5ba4f5' },
-  { key:'fechado',     label:'Fechado',         dot:'#52c07a' },
-  { key:'perdido',     label:'Perdido',         dot:'#e05252' },
+  { key:'novo',        label:'Novo',        pip:'#555' },
+  { key:'atendimento', label:'Atendimento',  pip:'#c9a84c' },
+  { key:'qualificado', label:'Qualificado',  pip:'#4caf80' },
+  { key:'agendado',    label:'Agendado',     pip:'#4caf80' },
+  { key:'proposta',    label:'Proposta',     pip:'#5080c0' },
+  { key:'fechado',     label:'Fechado',      pip:'#4caf80' },
+  { key:'perdido',     label:'Perdido',      pip:'#c05050' },
 ];
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 async function initAuth() {
   const { data } = await sb.auth.getSession();
-  if (!data.session) { window.location.href = 'agente-login.html'; return false; }
+  if (!data.session) { location.href = 'agente-login.html'; return false; }
   sessao = data.session;
-  const email = sessao.user.email;
-  document.getElementById('user-email').textContent = email;
-  document.getElementById('user-avatar').textContent = email[0].toUpperCase();
+  const e = sessao.user.email;
+  document.getElementById('user-email').textContent = e;
+  document.getElementById('user-av').textContent = e[0].toUpperCase();
   return true;
 }
-function sair() { sb.auth.signOut().then(() => window.location.href = 'agente-login.html'); }
+function sair() { sb.auth.signOut().then(() => location.href = 'agente-login.html'); }
 
 // ─── Dados ────────────────────────────────────────────────────────────────────
 async function carregarLeads() {
@@ -349,170 +594,141 @@ async function carregarLeads() {
   todos = data || [];
   renderView();
 }
-
-async function carregarConversas(leadId) {
-  const { data } = await sb.from('conversas').select('*').eq('lead_id', leadId).order('created_at', { ascending: true });
+async function carregarConversas(id) {
+  const { data } = await sb.from('conversas').select('*').eq('lead_id', id).order('created_at', { ascending: true });
   return data || [];
 }
-
-async function atualizarStatus(id, status) {
-  await sb.from('leads').update({ status }).eq('id', id);
-  const l = todos.find(x => x.id === id); if (l) l.status = status;
-  renderView();
-  notif('Status atualizado', status, 'green');
+async function atualizarStatus(id, s) {
+  await sb.from('leads').update({ status: s }).eq('id', id);
+  const l = todos.find(x => x.id === id); if (l) l.status = s;
+  renderView(); notif('Status atualizado', s, 'green');
 }
-
-async function salvarNotas(id, notas) {
-  await sb.from('leads').update({ notas_internas: notas }).eq('id', id);
+async function assumir(id) {
+  await sb.from('leads').update({ agente_ativo: false, assumido_por: sessao.user.email, assumido_em: new Date().toISOString() }).eq('id', id);
+  const l = todos.find(x => x.id === id); if (l) { l.agente_ativo = false; l.assumido_por = sessao.user.email; leadAtual = l; }
+  renderChatFoot(); renderInfo(); notif('Atendimento assumido', 'Agente pausado para este lead.', 'default');
+}
+async function devolver(id) {
+  await sb.from('leads').update({ agente_ativo: true, assumido_por: null, assumido_em: null }).eq('id', id);
+  const l = todos.find(x => x.id === id); if (l) { l.agente_ativo = true; l.assumido_por = null; leadAtual = l; }
+  renderChatFoot(); renderInfo(); notif('Agente reativado', '', 'green');
+}
+async function salvarNotas(id) {
+  const v = document.getElementById('notas-inp').value;
+  await sb.from('leads').update({ notas_internas: v }).eq('id', id);
   notif('Notas salvas', '', 'green');
 }
-
-async function assumirAtendimento(id) {
-  await sb.from('leads').update({ agente_ativo: false, assumido_por: sessao.user.email, assumido_em: new Date().toISOString() }).eq('id', id);
-  const l = todos.find(x => x.id === id);
-  if (l) { l.agente_ativo = false; l.assumido_por = sessao.user.email; }
-  renderChat();
-  renderLeadInfo();
-  notif('Atendimento assumido', 'O agente foi pausado para esse lead.', 'gold');
-}
-
-async function devolverAgente(id) {
-  await sb.from('leads').update({ agente_ativo: true, assumido_por: null, assumido_em: null }).eq('id', id);
-  const l = todos.find(x => x.id === id);
-  if (l) { l.agente_ativo = true; l.assumido_por = null; }
-  renderChat();
-  renderLeadInfo();
-  notif('Agente reativado', 'O agente voltará a responder.', 'green');
-}
-
-async function enviarMensagemConsultor(leadId, mensagem) {
-  const res = await fetch(`${WORKER_URL}/enviar-mensagem`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ lead_id: leadId, mensagem }),
+async function enviarConsultor(id) {
+  const inp = document.getElementById('chat-inp');
+  const btn = document.getElementById('chat-send');
+  const msg = inp.value.trim(); if (!msg) return;
+  inp.value = ''; btn.disabled = true;
+  const r = await fetch(`${WORKER_URL}/enviar-mensagem`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ lead_id: id, mensagem: msg }),
   });
-  if (!res.ok) { notif('Erro ao enviar', 'Verifique a Evolution API.', 'red'); return false; }
-  return true;
+  btn.disabled = false;
+  if (r.ok) { const c = await carregarConversas(id); renderMsgs(c); }
+  else notif('Erro ao enviar', 'Verifique a Evolution API.', 'red');
 }
 
 // ─── Views ────────────────────────────────────────────────────────────────────
-function trocarView(view) {
-  viewAtual = view;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === view));
-  const titles = { dashboard: 'Dashboard', kanban: 'Kanban', 'ao-vivo': 'Ao vivo' };
-  document.getElementById('topbar-title').textContent = titles[view] || view;
-  renderView();
+function trocarView(v) {
+  viewAtual = v;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === v));
+  const t = { dashboard:'Dashboard', kanban:'Kanban', 'ao-vivo':'Ao vivo' };
+  document.getElementById('topbar-title').textContent = t[v] || v;
+  document.getElementById('content').innerHTML = '<div class="loading">Carregando</div>';
+  setTimeout(renderView, 10);
 }
-
 function renderView() {
-  if (viewAtual === 'dashboard') renderDashboard();
+  if (viewAtual === 'dashboard') renderDash();
   else if (viewAtual === 'kanban') renderKanban();
   else if (viewAtual === 'ao-vivo') renderAoVivo();
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
-function renderDashboard() {
-  const agora = new Date();
-  const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-  const mes = new Date(agora.getFullYear(), agora.getMonth(), 1);
-
-  const total      = todos.length;
-  const domes      = todos.filter(l => new Date(l.created_at) >= mes).length;
-  const dohoje     = todos.filter(l => new Date(l.created_at) >= hoje).length;
-  const qual       = todos.filter(l => l.qualificado).length;
-  const agenda     = todos.filter(l => l.status === 'agendado').length;
-  const fechados   = todos.filter(l => l.status === 'fechado').length;
-  const ativos     = todos.filter(l => l.agente_ativo).length;
-  const taxa       = total > 0 ? Math.round((qual / total) * 100) : 0;
-  const semResp    = todos.filter(l => l.agente_ativo && diffH(l.created_at) > 2);
-
-  const qualTempo = todos.filter(l => l.qualificado && l.first_response_at);
-  let tMedio = '—';
-  if (qualTempo.length) {
-    const soma = qualTempo.reduce((a,l) => a + (new Date(l.first_response_at) - new Date(l.created_at)), 0);
-    const m = Math.round(soma / qualTempo.length / 60000);
-    tMedio = m < 60 ? `${m}min` : `${Math.round(m/60)}h`;
+function renderDash() {
+  const now = new Date();
+  const hoje = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const mes  = new Date(now.getFullYear(), now.getMonth(), 1);
+  const total   = todos.length;
+  const dohoje  = todos.filter(l => new Date(l.created_at) >= hoje).length;
+  const domes   = todos.filter(l => new Date(l.created_at) >= mes).length;
+  const qual    = todos.filter(l => l.qualificado).length;
+  const agenda  = todos.filter(l => l.status === 'agendado').length;
+  const fechados = todos.filter(l => l.status === 'fechado').length;
+  const ativos  = todos.filter(l => l.agente_ativo).length;
+  const taxa    = total > 0 ? Math.round((qual / total) * 100) : 0;
+  const qt = todos.filter(l => l.qualificado && l.first_response_at);
+  let tmed = '—';
+  if (qt.length) {
+    const s = qt.reduce((a,l) => a + (new Date(l.first_response_at) - new Date(l.created_at)), 0);
+    const m = Math.round(s / qt.length / 60000);
+    tmed = m < 60 ? `${m}min` : `${Math.round(m/60)}h`;
   }
-
-  // Atividade recente (últimos 15 leads ordenados)
-  const recentes = [...todos].slice(0, 15);
-
-  // Alertas
   const criticos = todos.filter(l => l.agente_ativo && diffH(l.created_at) > 24);
-  const alertas  = todos.filter(l => l.agente_ativo && diffH(l.created_at) > 2 && diffH(l.created_at) <= 24);
+  const warns    = todos.filter(l => l.agente_ativo && diffH(l.created_at) > 2 && diffH(l.created_at) <= 24);
+  const recentes = [...todos].slice(0, 12);
 
   document.getElementById('content').innerHTML = `
     <div class="kpi-grid">
       <div class="kpi"><div class="kpi-label">Leads hoje</div><div class="kpi-val gold">${dohoje}</div></div>
       <div class="kpi"><div class="kpi-label">Este mês</div><div class="kpi-val">${domes}</div></div>
-      <div class="kpi"><div class="kpi-label">Agente ativo</div><div class="kpi-val green">${ativos}</div><div class="kpi-sub">conversas em andamento</div></div>
+      <div class="kpi"><div class="kpi-label">Agente ativo</div><div class="kpi-val green">${ativos}</div><div class="kpi-sub">conversas em curso</div></div>
       <div class="kpi"><div class="kpi-label">Qualificados</div><div class="kpi-val gold">${qual}</div></div>
       <div class="kpi"><div class="kpi-label">Visitas agendadas</div><div class="kpi-val green">${agenda}</div></div>
       <div class="kpi"><div class="kpi-label">Fechados</div><div class="kpi-val green">${fechados}</div></div>
-      <div class="kpi"><div class="kpi-label">Taxa conversão</div><div class="kpi-val gold">${taxa}%</div></div>
-      <div class="kpi"><div class="kpi-label">Tempo médio qualif.</div><div class="kpi-val">${tMedio}</div></div>
+      <div class="kpi"><div class="kpi-label">Taxa de conversão</div><div class="kpi-val gold">${taxa}%</div></div>
+      <div class="kpi"><div class="kpi-label">Tempo médio qualif.</div><div class="kpi-val">${tmed}</div></div>
     </div>
-
     <div class="section" style="margin-bottom:20px">
-      <div class="section-head"><span class="section-title">Funil</span></div>
-      <div class="section-body">
-        <div class="funil">${renderFunilHTML()}</div>
-      </div>
+      <div class="section-head"><span class="section-label">Funil de vendas</span></div>
+      <div class="section-body"><div class="funil">${funilHTML()}</div></div>
     </div>
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="section">
         <div class="section-head">
-          <span class="section-title">⚠️ Alertas (${semResp.length} sem resposta)</span>
+          <span class="section-label">Alertas — sem resposta</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--red)">${criticos.length + warns.length}</span>
         </div>
-        <div class="section-body" style="padding:12px 16px">
+        <div class="section-body" style="padding:10px 14px">
           ${criticos.map(l => `
-            <div class="alerta vermelho" onclick="abrirLead('${l.id}')">
-              <div class="alerta-icon">🔴</div>
-              <div class="alerta-body">
-                <div class="alerta-nome">${l.nome}</div>
-                <div class="alerta-detalhe">${l.telefone}${l.ambiente ? ' · ' + l.ambiente : ''}</div>
-              </div>
-              <div class="alerta-tempo">${fmtDiff(l.created_at)}</div>
+            <div class="alerta crit" onclick="abrirLead('${l.id}')">
+              <div><div class="alerta-nome">${l.nome}</div><div class="alerta-det">${l.telefone}${l.ambiente?' · '+l.ambiente:''}</div></div>
+              <div class="alerta-badge">${fmtDiff(l.created_at)}</div>
             </div>`).join('')}
-          ${alertas.map(l => `
-            <div class="alerta laranja" onclick="abrirLead('${l.id}')">
-              <div class="alerta-icon">🟡</div>
-              <div class="alerta-body">
-                <div class="alerta-nome">${l.nome}</div>
-                <div class="alerta-detalhe">${l.telefone}${l.ambiente ? ' · ' + l.ambiente : ''}</div>
-              </div>
-              <div class="alerta-tempo">${fmtDiff(l.created_at)}</div>
+          ${warns.map(l => `
+            <div class="alerta warn" onclick="abrirLead('${l.id}')">
+              <div><div class="alerta-nome">${l.nome}</div><div class="alerta-det">${l.telefone}${l.ambiente?' · '+l.ambiente:''}</div></div>
+              <div class="alerta-badge">${fmtDiff(l.created_at)}</div>
             </div>`).join('')}
-          ${!semResp.length ? '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">✅ Nenhum alerta</div>' : ''}
+          ${!criticos.length && !warns.length ? '<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px;letter-spacing:.05em">Nenhum alerta</div>' : ''}
         </div>
       </div>
-
       <div class="section">
-        <div class="section-head"><span class="section-title">Atividade recente</span></div>
-        <div class="section-body" style="padding:8px 16px">
+        <div class="section-head"><span class="section-label">Atividade recente</span></div>
+        <div class="section-body" style="padding:6px 16px">
           <div class="feed">
             ${recentes.map(l => `
-              <div class="feed-item" onclick="abrirLead('${l.id}')" style="cursor:pointer">
-                <div class="feed-dot ${l.qualificado?'green':l.agente_ativo?'gold':'blue'}"></div>
-                <div class="feed-text"><strong>${l.nome}</strong> — ${l.status}${l.ambiente?' · '+l.ambiente:''}</div>
+              <div class="feed-item" onclick="abrirLead('${l.id}')">
+                <div class="feed-line"></div>
+                <div class="feed-text"><b>${l.nome}</b> &mdash; ${l.status}${l.ambiente?' · '+l.ambiente:''}</div>
                 <div class="feed-time">${fmtDiff(l.created_at)}</div>
               </div>`).join('')}
-            ${!recentes.length ? '<div class="feed-item"><div class="feed-text" style="color:var(--muted)">Nenhum lead ainda</div></div>' : ''}
+            ${!recentes.length ? '<div class="feed-item"><div class="feed-text" style="color:var(--muted)">Nenhum lead registrado</div></div>' : ''}
           </div>
         </div>
       </div>
     </div>`;
 }
 
-function renderFunilHTML() {
-  const cont = {};
-  ETAPAS.forEach(e => { cont[e.key] = 0; });
-  todos.forEach(l => { if (cont[l.status] !== undefined) cont[l.status]++; });
-  const max = Math.max(...Object.values(cont), 1);
+function funilHTML() {
+  const c = {}; ETAPAS.forEach(e => { c[e.key] = 0; });
+  todos.forEach(l => { if (c[l.status] !== undefined) c[l.status]++; });
+  const max = Math.max(...Object.values(c), 1);
   return ETAPAS.map((e, i) => {
-    const n = cont[e.key];
-    const h = Math.max(3, Math.round((n / max) * 52));
+    const n = c[e.key], h = Math.max(2, Math.round((n / max) * 48));
     const sep = i < ETAPAS.length - 1 ? '<div class="funil-sep">›</div>' : '';
     return `<div class="funil-col"><div class="funil-bar-wrap"><div class="funil-bar" style="height:${h}px"></div></div><div class="funil-n">${n}</div><div class="funil-lbl">${e.label}</div></div>${sep}`;
   }).join('');
@@ -520,306 +736,246 @@ function renderFunilHTML() {
 
 // ─── Kanban ───────────────────────────────────────────────────────────────────
 function renderKanban() {
-  const agrup = {};
-  ETAPAS.forEach(e => { agrup[e.key] = []; });
-  todos.forEach(l => { if (agrup[l.status]) agrup[l.status].push(l); });
-
+  const g = {}; ETAPAS.forEach(e => { g[e.key] = []; });
+  todos.forEach(l => { if (g[l.status]) g[l.status].push(l); });
   document.getElementById('content').innerHTML = `
-    <div class="kanban-wrap">
-      ${ETAPAS.map(e => `
-        <div class="kanban-col">
-          <div class="kanban-col-head">
-            <div class="kanban-col-dot" style="background:${e.dot}"></div>
-            <div class="kanban-col-name">${e.label}</div>
-            <div class="kanban-col-count">${agrup[e.key].length}</div>
-          </div>
-          <div class="kanban-cards">
-            ${agrup[e.key].length === 0
-              ? '<div class="kanban-empty">Nenhum lead</div>'
-              : agrup[e.key].map(l => kanbanCard(l)).join('')}
-          </div>
-        </div>`).join('')}
-    </div>`;
-}
-
-function kanbanCard(l) {
-  const { txt, cls } = tempo(l.created_at);
-  const statusBadge = l.agente_ativo
-    ? '<span class="badge-agente">Agente</span>'
-    : '<span class="badge-consultor">Consultor</span>';
-  return `
-    <div class="kanban-card" onclick="abrirLead('${l.id}')">
-      <div class="kanban-card-nome">${l.nome}</div>
-      <div class="kanban-card-tel">${l.telefone}</div>
-      ${l.ambiente ? `<div class="kanban-card-amb">🏠 ${l.ambiente}</div>` : ''}
-      <div class="kanban-card-footer">
-        <span class="kanban-card-tempo ${cls}">${txt}</span>
-        ${statusBadge}
-      </div>
+    <div class="kanban">${ETAPAS.map(e => `
+      <div class="k-col">
+        <div class="k-col-head">
+          <div class="k-col-pip" style="background:${e.pip}"></div>
+          <div class="k-col-name">${e.label}</div>
+          <div class="k-col-n">${g[e.key].length}</div>
+        </div>
+        <div class="k-cards">
+          ${!g[e.key].length ? '<div class="k-empty">Sem leads</div>' : g[e.key].map(l => {
+            const { txt, cls } = tempo(l.created_at);
+            return `<div class="k-card" onclick="abrirLead('${l.id}')">
+              <div class="k-card-name">${l.nome}</div>
+              <div class="k-card-phone">${l.telefone}</div>
+              ${l.ambiente ? `<div class="k-card-amb">${l.ambiente}</div>` : ''}
+              <div class="k-card-foot">
+                <span class="k-card-age ${cls}">${txt}</span>
+                <span class="k-tag ${l.agente_ativo?'agente':'consultor'}">${l.agente_ativo?'Agente':'Consultor'}</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('')}
     </div>`;
 }
 
 // ─── Ao vivo ──────────────────────────────────────────────────────────────────
 function renderAoVivo() {
-  const ativos = todos.filter(l => l.agente_ativo || !l.agente_ativo).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-  const badge = document.getElementById('badge-ao-vivo');
-  const novos = ativos.filter(l => novasMensagens.has(l.id)).length;
-  badge.textContent = novos;
-  badge.style.display = novos > 0 ? 'inline-block' : 'none';
-
-  if (!ativos.length) {
-    document.getElementById('content').innerHTML = `<div class="ao-vivo-empty"><div class="icon">📭</div><p>Nenhum lead ainda</p></div>`;
+  const lista = [...todos].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  const nv = lista.filter(l => novas.has(l.id)).length;
+  const badge = document.getElementById('badge-vivo');
+  badge.textContent = nv; badge.style.display = nv ? 'inline-block' : 'none';
+  if (!lista.length) {
+    document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-label">Nenhum lead registrado</div></div>`;
     return;
   }
-
   document.getElementById('content').innerHTML = `
-    <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">${ativos.length} lead${ativos.length!==1?'s':''} · clique para ver a conversa</div>
-    <div class="ao-vivo-grid">
-      ${ativos.map(l => {
-        const { txt, cls } = tempo(l.created_at);
-        const isNova = novasMensagens.has(l.id);
-        return `
-          <div class="conv-card${isNova?' nova':''}" onclick="abrirLead('${l.id}');novasMensagens.delete('${l.id}');renderAoVivo()">
-            <div class="conv-avatar">${l.nome[0]}</div>
-            <div class="conv-body">
-              <div class="conv-row1">
-                <div class="conv-nome">${l.nome}</div>
-                <span class="conv-status-badge badge b-${l.status}">${l.status}</span>
-              </div>
-              <div class="conv-preview">${l.telefone}${l.ambiente?' · '+l.ambiente:''}</div>
-              <div class="conv-meta">
-                <span class="conv-tempo ${cls}">${txt}</span>
-                ${l.qualificado?'<span class="conv-qual">✓ Qualificado</span>':''}
-                ${l.agente_ativo?'<span style="font-size:9px;color:var(--green)">● Agente</span>':'<span style="font-size:9px;color:var(--orange)">● Consultor</span>'}
-              </div>
-            </div>
-            ${isNova?'<div class="conv-new-dot"></div>':''}
-          </div>`;
-      }).join('')}
-    </div>`;
+    <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">${lista.length} lead${lista.length!==1?'s':''} — tempo real</div>
+    <div class="ao-vivo-list">${lista.map(l => {
+      const { txt, cls } = tempo(l.created_at);
+      const isNova = novas.has(l.id);
+      return `<div class="conv${isNova?' nova':''}" onclick="abrirLead('${l.id}');novas.delete('${l.id}');renderAoVivo()">
+        <div class="conv-av">${l.nome[0]}</div>
+        <div class="conv-body">
+          <div class="conv-r1">
+            <div class="conv-name">${l.nome}</div>
+            <span class="badge b-${l.status}">${l.status}</span>
+          </div>
+          <div class="conv-preview">${l.telefone}${l.ambiente?' · '+l.ambiente:''}</div>
+          <div class="conv-meta">
+            <span class="conv-age ${cls}">${txt}</span>
+            ${l.qualificado?'<span class="conv-qual">Qualificado</span>':''}
+            <span style="font-size:9px;font-weight:600;color:${l.agente_ativo?'var(--green)':'var(--amber)'}">
+              ${l.agente_ativo?'Agente':'Consultor'}
+            </span>
+          </div>
+        </div>
+        ${isNova?'<div class="new-pip"></div>':'<div class="conv-dot '+( diffH(l.created_at)>2?'amber':'green')+'"></div>'}
+      </div>`;
+    }).join('')}</div>`;
 }
 
-// ─── Painel Lead ──────────────────────────────────────────────────────────────
+// ─── Painel lead ──────────────────────────────────────────────────────────────
 function abrirLead(id) {
-  leadAtual = todos.find(l => l.id === id);
-  if (!leadAtual) return;
-  novasMensagens.delete(id);
-  document.getElementById('lead-overlay').classList.add('open');
+  leadAtual = todos.find(l => l.id === id); if (!leadAtual) return;
+  novas.delete(id);
+  document.getElementById('lo').classList.add('open');
   trocarTab('info');
 }
+function fecharLead() { document.getElementById('lo').classList.remove('open'); leadAtual = null; }
 
-function fecharLead() {
-  document.getElementById('lead-overlay').classList.remove('open');
-  leadAtual = null;
+function trocarTab(t) {
+  document.querySelectorAll('.lp-tab').forEach((el,i) => el.classList.toggle('active',['info','chat'][i]===t));
+  document.querySelectorAll('.lp-body').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${t}`).classList.add('active');
+  if (t === 'info') renderInfo();
+  if (t === 'chat') { renderChatFoot(); carregarConversas(leadAtual.id).then(renderMsgs); }
 }
 
-function trocarTab(tab) {
-  document.querySelectorAll('.lead-tab').forEach((el, i) => el.classList.toggle('active', ['info','chat'][i] === tab));
-  document.querySelectorAll('.lead-tab-content').forEach(el => el.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
-  if (tab === 'info') renderLeadInfo();
-  if (tab === 'chat') { renderChat(); carregarConversas(leadAtual.id).then(renderMensagens); }
-}
-
-function renderLeadInfo() {
+function renderInfo() {
   if (!leadAtual) return;
   const l = leadAtual;
-  document.getElementById('lp-nome').textContent = l.nome;
+  document.getElementById('lp-name').textContent = l.nome;
   document.getElementById('lp-badges').innerHTML = `
-    <span class="badge b-${l.status}" style="margin-right:4px">${l.status}</span>
-    ${l.qualificado?'<span class="badge" style="background:var(--green-dim);color:var(--green)">✓ Qualificado</span>':''}`;
-
+    <span class="badge b-${l.status}">${l.status}</span>
+    ${l.qualificado?'<span class="badge" style="background:var(--green-dim);color:var(--green)">Qualificado</span>':''}
+    ${!l.agente_ativo?'<span class="badge" style="background:var(--amber-dim);color:var(--amber)">Consultor ativo</span>':''}`;
   document.getElementById('lp-info').innerHTML = `
-    <div class="info-section-title">Contato</div>
+    <div class="info-cat">Contato</div>
     <div class="info-grid">
-      <div class="info-item"><label>Nome</label><p>${l.nome}</p></div>
-      <div class="info-item"><label>Telefone</label><p><a href="tel:${l.telefone}" style="color:var(--gold)">${l.telefone}</a></p></div>
-      <div class="info-item"><label>E-mail</label><p>${l.email||'—'}</p></div>
-      <div class="info-item"><label>Origem</label><p>${l.origem||'—'}</p></div>
+      <div class="ii"><label>Nome</label><p>${l.nome}</p></div>
+      <div class="ii"><label>Telefone</label><p><a href="tel:${l.telefone}">${l.telefone}</a></p></div>
+      <div class="ii"><label>E-mail</label><p>${l.email?`<a href="mailto:${l.email}">${l.email}</a>`:'—'}</p></div>
+      <div class="ii"><label>Origem</label><p>${l.origem||'—'}</p></div>
     </div>
-
-    <div class="info-section-title">Qualificação</div>
+    <div class="info-ruler"></div>
+    <div class="info-cat">Qualificação</div>
     <div class="info-grid">
-      <div class="info-item"><label>Ambiente</label><p>${l.ambiente||'—'}</p></div>
-      <div class="info-item"><label>Tipo de projeto</label><p>${l.tipo_projeto||'—'}</p></div>
-      <div class="info-item"><label>Orçamento</label><p>${l.orcamento_faixa||'—'}</p></div>
-      <div class="info-item"><label>Prazo</label><p>${l.prazo_desejado||'—'}</p></div>
+      <div class="ii"><label>Ambiente</label><p>${l.ambiente||'—'}</p></div>
+      <div class="ii"><label>Tipo</label><p>${l.tipo_projeto||'—'}</p></div>
+      <div class="ii"><label>Orçamento</label><p>${l.orcamento_faixa||'—'}</p></div>
+      <div class="ii"><label>Prazo</label><p>${l.prazo_desejado||'—'}</p></div>
     </div>
-
-    <div class="info-section-title">Status do atendimento</div>
+    <div class="info-ruler"></div>
+    <div class="info-cat">Atendimento</div>
     <div class="info-grid">
-      <div class="info-item"><label>Status</label>
+      <div class="ii full"><label>Status</label>
         <select class="status-sel" onchange="atualizarStatus('${l.id}',this.value)">
           ${ETAPAS.map(e=>`<option value="${e.key}"${l.status===e.key?' selected':''}>${e.label}</option>`).join('')}
         </select>
       </div>
-      <div class="info-item"><label>Responsável</label><p>${l.agente_ativo?'🤖 Agente IA':'👤 '+(l.assumido_por||'Consultor')}</p></div>
-      ${l.assumido_em?`<div class="info-item"><label>Assumido em</label><p>${fmtData(l.assumido_em)}</p></div>`:''}
-      <div class="info-item"><label>Entrada</label><p>${fmtData(l.created_at)}</p></div>
+      <div class="ii"><label>Responsável</label><p>${l.agente_ativo?'Agente IA':l.assumido_por||'Consultor'}</p></div>
+      <div class="ii"><label>Entrada</label><p>${fmtData(l.created_at)}</p></div>
     </div>
-
-    ${l.mensagem?`<div class="info-section-title">Mensagem inicial</div><p style="font-size:13px;color:var(--muted);line-height:1.5">${l.mensagem}</p>`:''}
-
-    <div class="info-section-title">Notas internas</div>
-    <textarea class="notas-area" id="notas-area" placeholder="Observações privadas sobre esse lead…">${l.notas_internas||''}</textarea>
-    <button class="btn btn-outline btn-sm btn-salvar-notas" onclick="salvarNotas('${l.id}',document.getElementById('notas-area').value)">Salvar notas</button>
-
-    <div class="info-section-title">Ações rápidas</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a class="btn btn-gold btn-sm" href="https://wa.me/55${l.telefone.replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a>
-      ${l.email?`<a class="btn btn-outline btn-sm" href="mailto:${l.email}">✉️ E-mail</a>`:''}
-      <a class="btn btn-outline btn-sm" href="tel:${l.telefone}">📞 Ligar</a>
-      <button class="btn btn-sm ${l.agente_ativo?'btn-red':'btn-green'}" onclick="${l.agente_ativo?`assumirAtendimento('${l.id}')`:`devolverAgente('${l.id}')`}">
-        ${l.agente_ativo?'⏸ Assumir atendimento':'▶ Devolver ao agente'}
+    ${l.mensagem?`<div class="info-ruler"></div><div class="info-cat">Mensagem inicial</div><p style="font-size:12px;color:var(--muted);line-height:1.6">${l.mensagem}</p>`:''}
+    <div class="info-ruler"></div>
+    <div class="info-cat">Notas internas</div>
+    <textarea class="notas" id="notas-inp" placeholder="Observações privadas…">${l.notas_internas||''}</textarea>
+    <div class="acoes-row" style="margin-top:6px">
+      <button class="btn btn-outline btn-sm" onclick="salvarNotas('${l.id}')">Salvar notas</button>
+    </div>
+    <div class="info-ruler"></div>
+    <div class="info-cat">Ações</div>
+    <div class="acoes-row">
+      <a class="btn btn-gold btn-sm" href="https://wa.me/55${l.telefone.replace(/\D/g,'')}" target="_blank">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.025.507 3.929 1.388 5.6L0 24l6.601-1.342A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.001-1.367l-.36-.214-3.716.975.993-3.624-.234-.373A9.818 9.818 0 1 1 12 21.818z"/></svg>
+        WhatsApp
+      </a>
+      ${l.email?`<a class="btn btn-outline btn-sm" href="mailto:${l.email}">E-mail</a>`:''}
+      <a class="btn btn-outline btn-sm" href="tel:${l.telefone}">Ligar</a>
+      <button class="btn btn-sm ${l.agente_ativo?'btn-red':'btn-green'}" onclick="${l.agente_ativo?`assumir('${l.id}')`:`devolver('${l.id}')`}">
+        ${l.agente_ativo?'Pausar agente':'Reativar agente'}
       </button>
     </div>`;
 }
 
-function renderChat() {
+function renderChatFoot() {
   if (!leadAtual) return;
   const l = leadAtual;
-  const footer = document.getElementById('chat-footer');
+  const foot = document.getElementById('chat-foot');
   if (l.agente_ativo) {
-    footer.innerHTML = `
+    foot.innerHTML = `
       <div class="chat-assumir">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">O agente está respondendo este lead automaticamente.</p>
-        <button class="btn btn-red" onclick="assumirAtendimento('${l.id}')">⏸ Assumir atendimento</button>
+        <p>O agente está conduzindo este atendimento automaticamente.</p>
+        <button class="btn btn-red" onclick="assumir('${l.id}')">Pausar agente e assumir</button>
       </div>`;
   } else {
-    footer.innerHTML = `
-      <div class="chat-consultor-label">Você está no controle — o agente está pausado</div>
-      <div class="chat-input-wrap">
-        <textarea class="chat-input" id="chat-input" placeholder="Digite sua mensagem…" rows="1" onkeydown="chatKeyDown(event,'${l.id}')"></textarea>
-        <button class="chat-send" onclick="enviarChat('${l.id}')" id="chat-send-btn">➤</button>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button class="btn btn-green btn-sm" onclick="devolverAgente('${l.id}')">▶ Devolver ao agente</button>
+    foot.innerHTML = `
+      <div class="chat-ctrl">
+        <div class="ctrl-label">Você está no controle</div>
+        <div class="chat-row">
+          <textarea class="chat-inp" id="chat-inp" rows="1" placeholder="Digite e pressione Enter para enviar…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarConsultor('${l.id}')}"></textarea>
+          <button class="chat-send" id="chat-send" onclick="enviarConsultor('${l.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn btn-green btn-sm" onclick="devolver('${l.id}')">Devolver ao agente</button>
+        </div>
       </div>`;
   }
 }
 
-function renderMensagens(conversas) {
-  const area = document.getElementById('chat-area');
-  if (!conversas.length) {
-    area.innerHTML = '<div class="chat-empty">Nenhuma mensagem ainda</div>';
-    return;
-  }
-  area.innerHTML = conversas.map(c => `
-    <div class="chat-msg ${c.role}">
-      <div class="chat-bubble">${c.mensagem.replace(/\n/g,'<br>')}</div>
-      <div class="chat-time">${fmtData(c.created_at)}</div>
+function renderMsgs(cs) {
+  const el = document.getElementById('chat-msgs');
+  if (!cs.length) { el.innerHTML = '<div class="chat-empty">Nenhuma mensagem ainda</div>'; return; }
+  el.innerHTML = cs.map(c => `
+    <div class="cm ${c.role}">
+      <div class="cm-bub">${c.mensagem.replace(/\n/g,'<br>')}</div>
+      <div class="cm-time">${fmtData(c.created_at)}</div>
     </div>`).join('');
-  setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
-}
-
-function chatKeyDown(e, leadId) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarChat(leadId); }
-}
-
-async function enviarChat(leadId) {
-  const input = document.getElementById('chat-input');
-  const btn = document.getElementById('chat-send-btn');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-  btn.disabled = true;
-  const ok = await enviarMensagemConsultor(leadId, msg);
-  btn.disabled = false;
-  if (ok) {
-    const conversas = await carregarConversas(leadId);
-    renderMensagens(conversas);
-  }
+  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 40);
 }
 
 // ─── Realtime ─────────────────────────────────────────────────────────────────
-function iniciarRealtime() {
-  sb.channel('leads-rt')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leads' }, p => {
-      todos.unshift(p.new);
-      renderView();
-      tocarSom();
-      notif('🔔 Novo lead!', `${p.new.nome} — ${p.new.telefone}`, 'gold');
-    })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'leads' }, p => {
-      const i = todos.findIndex(l => l.id === p.new.id);
-      if (i !== -1) todos[i] = p.new; else todos.unshift(p.new);
-      if (leadAtual?.id === p.new.id) { leadAtual = p.new; renderLeadInfo(); }
-      renderView();
-    })
-    .subscribe();
-
-  sb.channel('conversas-rt')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversas' }, p => {
-      novasMensagens.add(p.new.lead_id);
-      const badge = document.getElementById('badge-ao-vivo');
-      badge.textContent = novasMensagens.size;
-      badge.style.display = 'inline-block';
-      if (leadAtual?.id === p.new.lead_id && document.getElementById('tab-chat').classList.contains('active')) {
-        carregarConversas(p.new.lead_id).then(renderMensagens);
-        novasMensagens.delete(p.new.lead_id);
-      }
-      if (p.new.role === 'user') tocarSom();
-    })
-    .subscribe();
+function initRealtime() {
+  sb.channel('leads').on('postgres_changes',{event:'INSERT',schema:'public',table:'leads'},p=>{
+    todos.unshift(p.new); renderView();
+    beep(); notif(`${p.new.nome}`, p.new.telefone, 'default');
+  }).on('postgres_changes',{event:'UPDATE',schema:'public',table:'leads'},p=>{
+    const i = todos.findIndex(l=>l.id===p.new.id);
+    if (i!==-1) todos[i]=p.new; else todos.unshift(p.new);
+    if (leadAtual?.id===p.new.id) { leadAtual=p.new; renderInfo(); }
+    renderView();
+  }).subscribe();
+  sb.channel('conversas').on('postgres_changes',{event:'INSERT',schema:'public',table:'conversas'},p=>{
+    novas.add(p.new.lead_id);
+    const b = document.getElementById('badge-vivo'); b.textContent=novas.size; b.style.display='inline-block';
+    if (leadAtual?.id===p.new.lead_id && document.getElementById('tab-chat').classList.contains('active')) {
+      carregarConversas(p.new.lead_id).then(renderMsgs); novas.delete(p.new.lead_id);
+    }
+    if (p.new.role==='user') beep();
+  }).subscribe();
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function diffH(d) { return (Date.now() - new Date(d)) / 3600000; }
+// ─── Utilitários ──────────────────────────────────────────────────────────────
+function diffH(d) { return (Date.now()-new Date(d))/3600000; }
 function tempo(d) {
-  const min = Math.floor((Date.now() - new Date(d)) / 60000);
-  const h = Math.floor(min / 60); const dd = Math.floor(h / 24);
-  const txt = dd > 0 ? `${dd}d` : h > 0 ? `${h}h` : `${min}min`;
-  const cls = h >= 24 ? 'critico' : h >= 2 ? 'alerta' : '';
-  return { txt, cls };
+  const m = Math.floor((Date.now()-new Date(d))/60000);
+  const h = Math.floor(m/60), dd = Math.floor(h/24);
+  return { txt: dd>0?`${dd}d`:h>0?`${h}h`:`${m}min`, cls: h>=24?'crit':h>=2?'warn':'' };
 }
 function fmtDiff(d) { return tempo(d).txt; }
 function fmtData(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
-function classeBadge(s) {
-  return ({ novo:'b-novo', atendimento:'b-atendimento', qualificado:'b-qualificado', agendado:'b-agendado', proposta:'b-proposta', fechado:'b-fechado', perdido:'b-perdido' })[s] || 'b-novo';
-}
-
-function tocarSom() {
+function beep() {
   try {
-    const ctx = new AudioContext();
-    const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = 880; g.gain.setValueAtTime(0.2, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-    o.start(); o.stop(ctx.currentTime + 0.35);
-  } catch(_) {}
+    const ctx=new AudioContext(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);o.frequency.value=740;
+    g.gain.setValueAtTime(0.15,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+.3);
+    o.start();o.stop(ctx.currentTime+.3);
+  } catch(_){}
 }
-
-let notifTimer;
-function notif(titulo, corpo, tipo = 'gold') {
-  clearTimeout(notifTimer);
-  const wrap = document.getElementById('notif-wrap');
-  const el = document.createElement('div');
-  el.className = `notif ${tipo}`;
-  el.innerHTML = `<div class="notif-title">${titulo}</div>${corpo?`<div class="notif-body">${corpo}</div>`:''}`;
+function notif(t,b,tipo='default') {
+  const wrap=document.getElementById('notif-wrap');
+  const el=document.createElement('div');
+  el.className=`notif${tipo==='green'?' green':tipo==='red'?' red':''}`;
+  el.innerHTML=`<div class="notif-t">${t}</div>${b?`<div class="notif-b">${b}</div>`:''}`;
   wrap.prepend(el);
-  notifTimer = setTimeout(() => { el.remove(); }, 4000);
+  setTimeout(()=>el.remove(),4000);
 }
-
 function exportarCSV() {
-  const cols = ['nome','telefone','email','ambiente','tipo_projeto','orcamento_faixa','prazo_desejado','status','qualificado','created_at'];
-  const blob = new Blob([cols.join(';')+'\n'+todos.map(l=>cols.map(c=>`"${(l[c]??'').toString().replace(/"/g,'""')}"`).join(';')).join('\n')], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `leads-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const cols=['nome','telefone','email','ambiente','tipo_projeto','orcamento_faixa','prazo_desejado','status','qualificado','created_at'];
+  const blob=new Blob([cols.join(';')+'\n'+todos.map(l=>cols.map(c=>`"${(l[c]??'').toString().replace(/"/g,'""')}"`).join(';')).join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`realizzare-leads-${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
+setInterval(()=>{
+  document.getElementById('clock').textContent=new Date().toLocaleString('pt-BR');
+},1000);
 
-// Relógio
-setInterval(() => {
-  document.getElementById('topbar-time').textContent = new Date().toLocaleString('pt-BR');
-}, 1000);
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-(async () => {
-  if (!await initAuth()) return;
+(async()=>{
+  if(!await initAuth())return;
   await carregarLeads();
-  iniciarRealtime();
+  initRealtime();
 })();
 </script>
 </body>
