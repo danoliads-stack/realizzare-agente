@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agente IA — Realizzare Planejados</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1a1a1a; --surface: #242424; --border: #333;
+      --gold: #c9a84c; --gold-lt: #f0c040; --text: #e8e8e8;
+      --muted: #888; --danger: #e05252;
+    }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 48px 40px; width: 100%; max-width: 400px; text-align: center; }
+    .logo { font-size: 26px; font-weight: 700; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+    .logo-sub { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 32px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.3); color: var(--gold); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 32px; }
+    .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    label { display: block; text-align: left; font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    input { width: 100%; background: #1a1a1a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 15px; padding: 12px 14px; outline: none; transition: border-color .2s; margin-bottom: 18px; }
+    input:focus { border-color: var(--gold); }
+    button[type=submit] { width: 100%; background: var(--gold); color: #1a1a1a; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 14px; cursor: pointer; transition: background .2s, opacity .2s; margin-top: 4px; }
+    button[type=submit]:hover { background: var(--gold-lt); }
+    button[type=submit]:disabled { opacity: .5; cursor: not-allowed; }
+    .erro { background: rgba(224,82,82,.12); border: 1px solid rgba(224,82,82,.4); color: var(--danger); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .footer { margin-top: 28px; font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Realizzare</div>
+    <div class="logo-sub">Planejados</div>
+    <div class="badge">Agente IA</div>
+    <form id="form">
+      <div class="erro" id="erro"></div>
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com" required />
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" required />
+      <button type="submit" id="btn">Entrar</button>
+    </form>
+    <div class="footer">Acesso restrito à equipe Realizzare</div>
+  </div>
+  <script>
+    const SUPABASE_URL = 'https://xdecwdegfeczmyojrvrt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkZWN3ZGVnZmVjem15b2pydnJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MjM1OTUsImV4cCI6MjA5MjE5OTU5NX0.mL2rhQnqYkFnzU_KUuFrpC30pkGBIedKYNRq-4eTI-0';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = 'agente.html';
+    });
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const erroEl = document.getElementById('erro');
+      const btn = document.getElementById('btn');
+      erroEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+
+      const { error } = await sb.auth.signInWithPassword({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('senha').value,
+      });
+
+      if (error) {
+        erroEl.textContent = 'E-mail ou senha incorretos.';
+        erroEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        return;
+      }
+      window.location.href = 'agente.html';
+    });
+  </script>
+</body>
+</html>

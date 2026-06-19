@@ -1,0 +1,13 @@
+name = "realizzare-agente-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+SUPABASE_URL       = "https://xdecwdegfeczmyojrvrt.supabase.co"
+EVOLUTION_API_URL  = "https://SUA-EVOLUTION-API.onrender.com"
+EVOLUTION_INSTANCE = "realizzare"
+
+# Secrets — configurar via CLI após deploy:
+#   wrangler secret put SUPABASE_SERVICE_KEY
+#   wrangler secret put ANTHROPIC_API_KEY
+#   wrangler secret put EVOLUTION_API_KEY
